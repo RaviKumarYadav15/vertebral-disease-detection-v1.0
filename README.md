@@ -74,6 +74,52 @@ streamlit run app.py
 
 </div>
 
+### 🖥️ UI Showcase
+
+<div align="center">
+
+![Vertebral Disease Detection UI](ui-screenshot.png)
+
+> 💡 **Note:** Place the `ui-screenshot.png` file in your repository root to display this image on GitHub.
+
+**Live Demo Interface Features:**
+- 📤 Drag-and-drop file upload (JPG/PNG supported)
+- 🔍 Side-by-side comparison (Original vs. CLAHE-enhanced)
+- 📊 Real-time diagnosis with confidence scores
+- 🎨 Clean, dark-themed professional UI
+- ⚡ Instant predictions (<2 seconds)
+
+</div>
+
+---
+
+## 🛡️ Training the AI Gatekeeper (OOD Detection)
+
+To keep this repository lightweight and adhere to Git best practices, the raw image datasets are not included in version control. 
+
+If you wish to retrain the `gatekeeper_v1.keras` Out-of-Distribution (OOD) detection model from scratch, please follow these steps to assemble the training data:
+
+**1. Download the Data:**
+* **Random Images (Class 0 - Not X-Ray):** Download the [Natural Images Dataset from Kaggle](https://www.kaggle.com/datasets/prasunroy/natural-images). Select ~200 random images (dogs, cars, people, etc.).
+* **Digital Charts (Class 0 - Not X-Ray):** Download the [Data Visualization Charts Dataset from Kaggle](https://www.kaggle.com/datasets/mathurinache/data-visualization-charts) or save ~50 images of pie charts and bar graphs from Google Images.
+* **Real X-Rays (Class 1 - Is X-Ray):** Gather ~200 of your existing healthy and abnormal spinal X-rays.
+
+**2. Assemble the Folder Structure:**
+Create the following directory structure and place the images inside:
+
+```text
+data/
+└── gatekeeper_data/
+    ├── random/       # Place the ~250 natural images and charts here
+    └── xrays/        # Place the ~200 real spinal X-rays here
+```
+
+**3. Train the Model:**
+Once the folders are populated, run the training script from the root directory:
+```bash
+python -m src.train_gatekeeper
+```
+
 ---
 
 ## 🛠️ Technology Stack
@@ -148,8 +194,8 @@ Dense(1, sigmoid) → Output
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/RaviKumarYadav15/vertebral-disease-detection-v1.0
-cd vertebral-disease-detection
+git clone https://github.com/RaviKumarYadav15/vertebral-disease-detection-v1.0.git
+cd vertebral-disease-detection-v1.0
 
 # 2. Create virtual environment
 python -m venv venv
@@ -225,26 +271,40 @@ print(f"Confidence: {result['confidence']:.2%}")
 vertebral-disease-detection/
 │
 ├── 📂 data/
-│   ├── raw/                    # Original X-ray images (500 healthy, 500 abnormal)
-│   └── processed/              # Enhanced images after DIP pipeline
+│   ├── gatekeeper_data/         # OOD detection training data
+│   │   ├── random/              # Non-X-ray images (natural images, charts)
+│   │   └── xrays/               # Real X-ray images
+│   ├── processed/               # Enhanced images after DIP pipeline
+│   │   ├── abnormal/            # Preprocessed abnormal X-rays
+│   │   └── healthy/             # Preprocessed healthy X-rays
+│   └── raw/                     # Original X-ray images
+│       ├── abnormal/            # 500 abnormal spine X-rays
+│       └── healthy/             # 500 healthy spine X-rays
 │
-├── 📂 models/                  # Saved model checkpoints
-│   ├── baseline_logistic.pkl   # Baseline ML model
-│   └── cnn_spine_v1.keras      # Trained CNN model
+├── 📂 models/                   # Saved model checkpoints
+│   ├── baseline_logistic.pkl    # Baseline ML model
+│   ├── cnn_spine_v1.keras       # Trained CNN classifier
+│   └── gatekeeper_v1.keras      # OOD detection model
 │
-├── 📂 src/                     # Source code
-│   ├── config.py               # Configuration & hyperparameters
-│   ├── preprocess.py           # Image preprocessing pipeline
-│   ├── model_cnn.py            # CNN architecture definition
-│   ├── train_cnn.py            # Training script with callbacks
-│   ├── predict.py              # Inference engine
-│   └── compare_models.py       # Model evaluation & comparison
+├── 📂 src/                      # Source code
+│   ├── __init__.py              # Package initialization
+│   ├── config.py                # Configuration & hyperparameters
+│   ├── preprocess.py            # Image preprocessing pipeline
+│   ├── model_cnn.py             # CNN architecture definition
+│   ├── train_baseline.py        # Baseline model training
+│   ├── train_cnn.py             # CNN training script with callbacks
+│   ├── train_gatekeeper.py      # OOD detection model training
+│   ├── predict.py               # Inference engine
+│   └── compare_models.py        # Model evaluation & comparison
 │
-├── 📄 app.py                   # Streamlit web application
-├── 📊 training_history.png     # Training/validation curves
-├── 📋 requirements.txt         # Python dependencies
-├── 📖 README.md                # Project documentation
-└── 📜 LICENSE                  # MIT License
+├── 📂 uploads/                  # Temporary upload directory for web app
+├── 📂 venv/                     # Virtual environment (not in git)
+│
+├── 📄 app.py                    # Streamlit web application
+├── 📊 training_history.png      # Training/validation curves
+├── 📋 requirements.txt          # Python dependencies
+├── 📖 README.md                 # Project documentation
+└── 🔒 .gitignore                # Git ignore rules
 ```
 
 ---
@@ -269,7 +329,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Dataset:** Vertebral X-ray images from [source/repository]
+- **Dataset:** Vertebral X-ray images from [Kaggle - Spine Fracture Prediction from X-rays](https://www.kaggle.com/datasets/vuppalaadithyasairam/spine-fracture-prediction-from-xrays)
 - **Inspiration:** Medical AI research community
 - **Libraries:** TensorFlow, OpenCV, Streamlit teams
 - **Guidance:** Deep learning and computer vision best practices
@@ -281,6 +341,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Ravi** - Project Author
 
 - GitHub: [@RaviKumarYadav15](https://github.com/RaviKumarYadav15)
+
 ---
 
 <div align="center">
