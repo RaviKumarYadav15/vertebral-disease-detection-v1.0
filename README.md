@@ -16,7 +16,8 @@
 ## 🔬 Overview
 
 The **Vertebral Disease Detection System** is an end-to-end deep learning pipeline designed to classify spinal X-rays as **Healthy** or **Abnormal** with exceptional accuracy. Leveraging advanced digital image processing techniques and a custom CNN architecture, this system demonstrates the potential of AI in medical diagnostics.
-
+___
+**🌐 Live Deployment:** Try the interactive web application at **https://spine-fracture-ai.streamlit.app/**
 > **⚠️ Medical Disclaimer:** This is an educational proof-of-concept project. It should **NOT** be used for actual medical diagnosis without proper clinical validation and physician oversight.
 
 ### 🎯 Project Objectives
