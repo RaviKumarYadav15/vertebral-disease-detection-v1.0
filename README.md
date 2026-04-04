@@ -85,7 +85,7 @@ streamlit run app.py
 
 <div align="center">
 
-![Vertebral Disease Detection UI](images/ui-screenshot.png)
+![Vertebral Disease Detection UI](ui-screenshot.png)
 
 **Live Demo Interface Features:**
 - 📤 Drag-and-drop file upload (JPG/PNG supported)
