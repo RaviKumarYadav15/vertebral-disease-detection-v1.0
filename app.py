@@ -88,12 +88,12 @@ with right_col:
             
             with img1:
                 # Use the raw, untouched uploaded_file
-                st.image(uploaded_file, caption="Original Upload", use_column_width="auto")
+                st.image(uploaded_file, caption="Original Upload", use_column_width=True)
                 
             with img2:
                 if processed_img is not None:
                     # Use the raw, untouched processed image
-                    st.image(processed_img, caption="AI Vision [CLAHE] Histogram Equalisation Enhanced)", use_column_width="auto", clamp=True, channels="GRAY")
+                    st.image(processed_img, caption="AI Vision [CLAHE] Histogram Equalisation Enhanced)", use_column_width=True, clamp=True, channels="GRAY")
 
 # ==========================================
 # FOOTER: Disclaimer & Copyright
