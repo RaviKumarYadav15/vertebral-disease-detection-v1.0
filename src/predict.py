@@ -1,52 +1,89 @@
 import tensorflow as tf
 import cv2
 import numpy as np
-from src.config import MODELS_DIR, IMAGE_WIDTH, IMAGE_HEIGHT
-from src.preprocess import process_image
 import os
+from src.config import MODELS_DIR
+from src.preprocess import process_image
 
-# Load the model once when the script starts
-MODEL_PATH = os.path.join(MODELS_DIR, "cnn_spine_v1.keras")
+
+# --- 1. LOAD BOTH MODELS ---
+SPINE_MODEL_PATH = os.path.join(MODELS_DIR, "cnn_spine_v1.keras")
+GATEKEEPER_MODEL_PATH = os.path.join(MODELS_DIR, "gatekeeper_v1.keras")
+
 try:
-    model = tf.keras.models.load_model(MODEL_PATH)
+    spine_model = tf.keras.models.load_model(SPINE_MODEL_PATH)
 except Exception as e:
-    print(f"Error loading model: {e}. Make sure you have trained it first!")
-    model = None
+    print(f"❌ Error loading Specialist model: {e}")
+    spine_model = None
+
+try:
+    gatekeeper_model = tf.keras.models.load_model(GATEKEEPER_MODEL_PATH)
+    print("🛡️ Gatekeeper Security is ONLINE.")
+except Exception as e:
+    print("⚠️ Gatekeeper Model not found. Please run src.train_gatekeeper first.")
+    gatekeeper_model = None
+
+# simple validation (failed code)
+# def is_valid_xray(img_array):
+#     """
+#     An advanced 'bouncer' that ignores JPEG noise and looks at structural color distribution.
+#     """
+#     # 1. Solid Background Check
+#     # Find the most common pixel color in the image
+#     unique, counts = np.unique(img_array, return_counts=True)
+#     max_color_ratio = np.max(counts) / img_array.size
+    
+#     # If one single exact color makes up more than 50% of the image, 
+#     # it is almost certainly a digital diagram, not an organic X-ray.
+#     if max_color_ratio > 0.50:
+#         return False
+        
+#     # 2. Quantized Color Count (Stripping JPEG Noise)
+#     # We group similar colors together (e.g., rounding down to the nearest 10)
+#     quantized_img = (img_array // 10) * 10
+#     unique_colors = len(np.unique(quantized_img))
+    
+#     # After stripping the noise, organic X-rays still have dozens of gray zones.
+#     # Diagrams will collapse down to just a few core colors.
+#     if unique_colors < 15:
+#         return False
+        
+#     return True
 
 def predict_xray(image_path):
     """
-    Takes an X-ray image path, processes it, and returns the diagnosis.
+    Two-Stage Enterprise Inference Pipeline.
     """
-    if model is None:
-        return "Model not found", 0.0, None
+    if spine_model is None:
+        return "Error: Specialist Model not found", 0.0, None
 
-    # 1. Run the exact same OpenCV pipeline used for training
+    # Process Image
     processed_img = process_image(image_path)
-    
     if processed_img is None:
-        return "Invalid Image", 0.0, None
+        return "Error: Could not read image", 0.0, None
 
-    # 2. Prepare the image for the Neural Network
-    # Neural networks expect a "batch" of images, even if it's just one.
-    # We change the shape from (224, 224) to (1, 224, 224, 1)
-    input_tensor = np.expand_dims(processed_img, axis=0) # Add batch dimension
-    input_tensor = np.expand_dims(input_tensor, axis=-1) # Add channel dimension (grayscale)
+    # Prepare Tensor (1, 224, 224, 1)
+    input_tensor = np.expand_dims(processed_img, axis=0)
+    input_tensor = np.expand_dims(input_tensor, axis=-1)
 
-    # 3. Get the prediction
-    # The output is a probability between 0.0 and 1.0
-    prediction = model.predict(input_tensor)[0][0]
+    # --- STAGE 1: THE GATEKEEPER CHECK ---
+    if gatekeeper_model is not None:
+        is_xray_prob = gatekeeper_model.predict(input_tensor, verbose=0)[0][0]
+        
+        # If it's closer to 0, it's a random image/pie chart
+        if is_xray_prob < 0.5:
+            fake_confidence = (1.0 - is_xray_prob) * 100
+            return f"Access Denied: AI Bouncer rejected image ({fake_confidence:.1f}% sure it is not an X-ray).", 0.0, processed_img
 
-    # 4. Interpret the result based on ['abnormal', 'healthy'] mapping
+    # --- STAGE 2: THE SPECIALIST DIAGNOSIS ---
+    # The image passed the check, so the Specialist looks for disease.
+    prediction = spine_model.predict(input_tensor, verbose=0)[0][0]
+
     if prediction < 0.5:
         diagnosis = "Abnormal / Diseased"
-        # Since 0 is the target for Abnormal, a 0.02 prediction 
-        # means the model is 98% sure it's abnormal.
         confidence = (1.0 - prediction) * 100 
     else:
         diagnosis = "Healthy"
-        # Since 1 is the target for Healthy, a 0.98 prediction
-        # means the model is 98% sure it's healthy.
         confidence = prediction * 100
 
-    # --- THE FIX: Return the processed_img so Streamlit can display it! ---
     return diagnosis, confidence, processed_img

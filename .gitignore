@@ -4,5 +4,5 @@ __pycache__/
 data/processed/
 models/*.keras
 models/*.pkl
-app/uploads/
+uploads/
 *.log
