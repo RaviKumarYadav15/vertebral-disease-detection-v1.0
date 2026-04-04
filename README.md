@@ -179,15 +179,22 @@ Raw Image Upload
 ```
 Input (224×224×1)
     ↓
-Conv2D(32) → ReLU → MaxPool
+Rescaling (1/255)
     ↓
-Conv2D(64) → ReLU → MaxPool
+Data Augmentation Layer
+├─ RandomFlip (horizontal)
+├─ RandomRotation (±10%)
+└─ RandomZoom (±10%)
     ↓
-Conv2D(128) → ReLU → MaxPool
+Conv2D(32, 3×3, padding='same') → ReLU → MaxPool(2×2)
+    ↓
+Conv2D(64, 3×3, padding='same') → ReLU → MaxPool(2×2)
+    ↓
+Conv2D(128, 3×3, padding='same') → ReLU → MaxPool(2×2)
     ↓
 GlobalAveragePooling2D
     ↓
-Dense(64, he_normal) → ReLU
+Dense(128, he_normal) → ReLU
     ↓
 Dropout(0.6)
     ↓
