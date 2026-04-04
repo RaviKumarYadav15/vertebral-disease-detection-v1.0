@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏥 Vertebral Disease Detection System
+# 🏥 Vertebral Fracture Detection System
 
 ### AI-Powered Spinal X-Ray Analysis for Early Diagnosis
 
@@ -15,7 +15,7 @@
 
 ## 🔬 Overview
 
-The **Vertebral Disease Detection System** is an end-to-end deep learning pipeline designed to classify spinal X-rays as **Healthy** or **Abnormal** with exceptional accuracy. Leveraging advanced digital image processing techniques and a custom CNN architecture, this system demonstrates the potential of AI in medical diagnostics.
+The **Vertebral Fracture Detection System** is an end-to-end deep learning pipeline designed to classify spinal X-rays as **Healthy** or **Abnormal** with exceptional accuracy. Leveraging advanced digital image processing techniques and a custom CNN architecture, this system demonstrates the potential of AI in medical diagnostics.
 ___
 **🌐 Live Deployment:** Try the interactive web application at **https://spine-fracture-ai.streamlit.app/**
 > **⚠️ Medical Disclaimer:** This is an educational proof-of-concept project. It should **NOT** be used for actual medical diagnosis without proper clinical validation and physician oversight.
@@ -86,7 +86,7 @@ streamlit run app.py
 
 <div align="center">
 
-![Vertebral Disease Detection UI](ui-screenshot.png)
+![Vertebral Fracture Detection UI](ui-screenshot.png)
 
 **Live Demo Interface Features:**
 - 📤 Drag-and-drop file upload (JPG/PNG supported)
@@ -245,6 +245,9 @@ streamlit==1.29.0
 pillow>=9.3.0
 pandas>=1.5.0
 ```
+___
+***removed exact version as it needed locally for pip, and while deployment change python version to 11 for tensor flow ***
+___
 
 ---
 
