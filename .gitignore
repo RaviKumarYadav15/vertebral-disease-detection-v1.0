@@ -2,7 +2,7 @@ venv/
 __pycache__/
 .ipynb_checkpoints/
 data/processed/
-models/*.keras
-models/*.pkl
+# models/*.keras
+# models/*.pkl
 uploads/
 *.log
