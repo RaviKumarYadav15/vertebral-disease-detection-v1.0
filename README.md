@@ -22,6 +22,7 @@ The **Vertebral Disease Detection System** is an end-to-end deep learning pipeli
 ### 🎯 Project Objectives
 
 - ✅ Build a robust binary classifier for vertebral abnormality detection
+- ✅ Implement OOD detection to prevent misdiagnosis on invalid inputs
 - ✅ Implement production-grade preprocessing pipelines using OpenCV
 - ✅ Overcome common ML challenges (class imbalance, overfitting, gradient issues)
 - ✅ Deploy an interactive web interface for real-time predictions
@@ -30,6 +31,12 @@ The **Vertebral Disease Detection System** is an end-to-end deep learning pipeli
 ---
 
 ## ✨ Features
+
+### 🛡️ **Out-of-Distribution (OOD) Detection**
+- AI Gatekeeper validates input images before diagnosis
+- Rejects non-X-ray images (photos, charts, random images)
+- Prevents false diagnoses on invalid inputs
+- Dual-model architecture for robust prediction
 
 ### 🧠 **Advanced Deep Learning**
 - Custom CNN architecture optimized for medical imaging
@@ -78,9 +85,7 @@ streamlit run app.py
 
 <div align="center">
 
-![Vertebral Disease Detection UI](ui-screenshot.png)
-
-> 💡 **Note:** Place the `ui-screenshot.png` file in your repository root to display this image on GitHub.
+![Vertebral Disease Detection UI](images/ui-screenshot.png)
 
 **Live Demo Interface Features:**
 - 📤 Drag-and-drop file upload (JPG/PNG supported)
@@ -144,20 +149,30 @@ python -m src.train_gatekeeper
 ### System Pipeline
 
 ```
-Raw X-Ray Image
+Raw Image Upload
       ↓
-Preprocessing (Grayscale Conversion)
-      ↓
-CLAHE Enhancement (Clip Limit: 1.2)
-      ↓
-Gaussian Blur (3×3 Kernel)
-      ↓
-Resize to 224×224
-      ↓
-CNN Model
-      ↓
-Prediction (Healthy/Abnormal)
+🛡️ OOD Gatekeeper (Is this an X-ray?)
+      ├─→ ❌ Not X-ray → Reject
+      └─→ ✅ Valid X-ray
+            ↓
+      Preprocessing (Grayscale Conversion)
+            ↓
+      CLAHE Enhancement (Clip Limit: 1.2)
+            ↓
+      Gaussian Blur (3×3 Kernel)
+            ↓
+      Resize to 224×224
+            ↓
+      🧠 CNN Classifier Model
+            ↓
+      Prediction (Healthy/Abnormal)
+            ↓
+      📊 Confidence Score
 ```
+
+**Two-Stage Architecture:**
+1. **Stage 1 - OOD Detection:** `gatekeeper_v1.keras` validates input is a real X-ray
+2. **Stage 2 - Classification:** `cnn_spine_v1.keras` diagnoses healthy vs. abnormal
 
 ### CNN Architecture
 
